@@ -10,25 +10,53 @@
   
 <body>
 <div id="container">
-    <video autoplay="true" id="videoElement">
+    <video autoplay="true" id="videoElement1">
     </video>
-     <video style="float:right;"autoplay="true" id="videoElement2">
+     <video style="float:right;" id="videoElement2">
     </video>
 </div>
 
 <script>
+let video1 = document.querySelector('#videoElement1');
+let video2 = document.querySelector('#videoElement2');
+  
+navigator.mediaDevices.getUserMedia({
+	video: {
+		facingMode: 'environment',
+		width: {min: 360, ideal: 1280, max: 1920},
+		height: {min: 240, ideal: 720, max: 1080}
+	}
+}).then((stream) => {
+	if (video.srcObject !== undefined) {
+		video1.srcObject = stream;
+	} else if (video.mozSrcObject !== undefined) {
+		video1.mozSrcObject = stream;
+	} else if (window.URL.createObjectURL) {
+		video1.src = window.URL.createObjectURL(stream);
+	} else if (window.webkitURL) {
+		video1.src = window.webkitURL.createObjectURL(stream);
+	} else {
+		video.src = stream;
+	}
+	video1.playsInline = true;
+	video1.play();
+  	if (video2.srcObject !== undefined) {
+		video2.srcObject = stream;
+	} else if (video2.mozSrcObject !== undefined) {
+		video2.mozSrcObject = stream;
+	} else if (window.URL.createObjectURL) {
+		video2.src = window.URL.createObjectURL(stream);
+	} else if (window.webkitURL) {
+		video2.src = window.webkitURL.createObjectURL(stream);
+	} else {
+		video2.src = stream;
+	}
+	video2.playsInline = true;
+	video2.play();
+}).catch((error) => {
+	console.log(error);
+});
 
-var video = document.querySelector("#videoElement");
- 
-if (navigator.mediaDevices.getUserMedia) {       
-    navigator.mediaDevices.getUserMedia({video: true})
-  .then(function(stream) {
-    video.srcObject = stream;document.querySelector("#videoElement2").srcObject = stream;
-  })
-  .catch(function(err0r) {
-    console.log("Something went wrong!");
-  });
-}
 </script>
 </body>
 </html>
