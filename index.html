@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+video {
+  width: 49.32vw;
+  margin:0;padding:0;
+  height: 100vh;
+  display:inline-block;
+}
+body,html{
+  margin:0;
+}
+</style>
+</head>
+  
+<body>
+<div id="container">
+    <video autoplay="true" id="videoElement">
+    </video>
+     <video style="float:right;"autoplay="true" id="videoElement2">
+    </video>
+</div>
+
+<script>
+var elem = document.documentElement;
+function openFullscreen() {
+  if (elem.requestFullscreen) {
+    elem.requestFullscreen();
+  } else if (elem.webkitRequestFullscreen) { 
+    elem.webkitRequestFullscreen();
+  } else if (elem.msRequestFullscreen) {
+    elem.msRequestFullscreen();
+  }
+}
+openFullscreen();
+var video = document.querySelector("#videoElement");
+ 
+if (navigator.mediaDevices.getUserMedia) {       
+    navigator.mediaDevices.getUserMedia({video: true})
+  .then(function(stream) {
+    video.srcObject = stream;document.querySelector("#videoElement2").srcObject = stream;
+  })
+  .catch(function(err0r) {
+    console.log("Something went wrong!");
+  });
+}
+</script>
+</body>
+</html>
