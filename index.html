@@ -16,7 +16,7 @@ body,html{
   
 <body>
 <div id="container">
-    <video autoplay="true" playsinline controls id="videoElement">
+    <video autoplay="true" playsinline id="videoElement">
     </video>
      <video style="float:right;"autoplay="true" playsinline controls id="videoElement2">
     </video>
@@ -31,7 +31,11 @@ if (navigator.mediaDevices.getUserMedia) {
     navigator.mediaDevices.getUserMedia({video: true})
   .then(function(stream) {
     video.srcObject = stream;
-      
+      video.setAttribute("playsinline", true);
+video.setAttribute("controls", true);
+setTimeout(() => {
+    video.removeAttribute("controls");
+});
   video2.srcObject = stream;     
   })
   .catch(function(err0r) {
