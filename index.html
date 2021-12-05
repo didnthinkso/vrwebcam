@@ -29,8 +29,8 @@ top: 50%;
 </head>
   
 <body>
-	<h1 style="left:50%;">Overlay</h1>
-<h1 style="right:25%;">Overlay</h1>
+	<h1 id="ov1" style="left:50%;">Overlay</h1>
+<h1 id="ov2" style="right:25%;">Overlay</h1>
 <div id="container">
     <video id="videoElement1">
     </video>
@@ -39,6 +39,8 @@ top: 50%;
 </div>
 
 <script>
+	document.querySelector('#ov1').left=document.body.offsetWidth-document.querySelector('#ov1').offsetWidth-document.body.offsetWidth/2;
+	document.querySelector('#ov2').right=document.body.offsetWidth-document.querySelector('#ov2').offsetWidth-document.body.offsetWidth/2;
 let video1 = document.querySelector('#videoElement1');
 let video2 = document.querySelector('#videoElement2');
   
