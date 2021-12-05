@@ -27,7 +27,7 @@ navigator.mediaDevices.getUserMedia({
 		height: {min: 240, ideal: 720, max: 1080}
 	}
 }).then((stream) => {
-	if (video.srcObject !== undefined) {
+	if (video1.srcObject !== undefined) {
 		video1.srcObject = stream;
 	} else if (video.mozSrcObject !== undefined) {
 		video1.mozSrcObject = stream;
