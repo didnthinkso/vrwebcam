@@ -36,7 +36,7 @@ navigator.mediaDevices.getUserMedia({
 	} else if (window.webkitURL) {
 		video1.src = window.webkitURL.createObjectURL(stream);
 	} else {
-		video.src = stream;
+		video1.src = stream;
 	}
 	video1.playsInline = true;
 	video1.play();
