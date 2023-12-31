@@ -53,7 +53,8 @@ let video2 = document.querySelector('#videoElement2');
   
 navigator.mediaDevices.getUserMedia({
 	video: {
-		facingMode: 'environment',
+		//facingMode: 'environment',
+		deviceId: '086A079A7E3639031D8218364B1F0E9A7AF5F933',
 		width: {min: 360, ideal: 1280, max: 1920},
 		height: {min: 240, ideal: 720, max: 1080}
 	}
