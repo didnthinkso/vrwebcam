@@ -7,7 +7,7 @@
       content="width=device-width, initial-scale=1.0, viewport-fit=cover"
     />
     <meta name="apple-mobile-web-app-status-bar-style" content="white" />
-
+<title>VR Webcam</title>
     <meta name="apple-mobile-web-app-title" content="Vr Webcam" />
     <style>
       video {
@@ -28,18 +28,6 @@
         overflow: hidden;
       }
 
-      #ToggleButton {
-        width: 100vw;
-        height: 20vh;
-        background-color: red;
-        position:fixed;
-        top:0;
-        display: none;
-        font-size: xxx-large;
-        color: #000;
-        border: none;
-        outline: none !important;
-      }
 
       select {
         display: block;
@@ -59,14 +47,20 @@
 
     <div id="settings" style="display: none"></div>
 
-    <button id="ToggleButton">Toggle View</button>
     <script>
       let FeedSettingsToggle = true;
 
       document.addEventListener("click",  ProcessClick);
-     
-      document.querySelector("#ToggleButton").addEventListener("click", () => {
-        FeedSettingsToggle = !FeedSettingsToggle;
+  
+
+      function ProcessClick (Event) {
+        
+        if (
+          !["BUTTON", "INPUT", "SELECT", "OPTION"].includes(
+            Event.target.tagName
+          )
+        ) {
+          FeedSettingsToggle = !FeedSettingsToggle;
           if (FeedSettingsToggle) {
             // Show live feed
             document.querySelector("#feed").style.display = "block";
@@ -76,20 +70,7 @@
             document.querySelector("#settings").style.display = "block";
             document.querySelector("#feed").style.display = "none";
           }
-        }
-  )
 
-      function ProcessClick (Event) {
-        
-        if (
-          !["BUTTON", "INPUT", "SELECT", "OPTION"].includes(
-            Event.target.tagName
-          )
-        ) {
-          document.querySelector("#ToggleButton").style.display = "block";
-          setTimeout(() => {
-            document.querySelector("#ToggleButton").style.display = "none";
-          }, 3000)
       };
     }
 
