@@ -36,6 +36,9 @@
         top:0;
         display: none;
         font-size: xxx-large;
+        color: #000;
+        border: none;
+        outline: none !important;
       }
 
       select {
@@ -60,7 +63,7 @@
     <script>
       let FeedSettingsToggle = true;
 
-      window.addEventListener("click",  ProcessClick);
+      document.addEventListener("click",  ProcessClick);
      
       document.querySelector("#ToggleButton").addEventListener("click", () => {
         FeedSettingsToggle = !FeedSettingsToggle;
@@ -77,6 +80,7 @@
   )
 
       function ProcessClick (Event) {
+        
         if (
           !["BUTTON", "INPUT", "SELECT", "OPTION"].includes(
             Event.target.tagName
