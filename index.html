@@ -1,94 +1,265 @@
 <!DOCTYPE html>
 <html>
-<head>
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"> 
-<meta name="apple-mobile-web-app-status-bar-style" content="white">
+  <head>
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, viewport-fit=cover"
+    />
+    <meta name="apple-mobile-web-app-status-bar-style" content="white" />
 
-<meta name="apple-mobile-web-app-title" content="Vr Webcam">
-	<style>
-		video {
-  width: 50vw;
-  margin:0;padding:0;
-  height: 100vh;
-  display:inline-block;object-fit: cover;
-}
-body,html{
-	background: black;
-  margin:0;
-}
-		h1 {
-position:fixed;
-			display:none;
-font-family:futura;
-top: 50%;
-			color:white;
-			text-shadow: 0px 0px 8px #000000;
+    <meta name="apple-mobile-web-app-title" content="Vr Webcam" />
+    <style>
+      video {
+        width: 50vw;
+        margin: 0;
+        padding: 0;
+        height: 100vh;
+        display: inline-block;
+        object-fit: cover;
+      }
 
-}
-</style>
-</head>
-  
-<body>
-	
-	<h1 id="ov1" style="left:50%;">Overlay</h1>
-<h1 id="ov2" style="right:25%;">Overlay</h1>
+      body,
+      html {
+        background: black;
+        margin: 0;
+      }
 
-<div id="container">
-    <video id="videoElement1" style="   /* transform: rotateY(180deg);
-    -webkit-transform:rotateY(180deg); Safari and Chrome 
-    -moz-transform:rotateY(180deg); */ ">
-    </video>
-     <video style="float:right; /* transform: rotateY(180deg);
-    -webkit-transform:rotateY(180deg);  Safari and Chrome 
-    -moz-transform:rotateY(180deg); */ " id="videoElement2">
-    </video>
-</div>
+      h1 {
+        position: fixed;
+        display: none;
+        font-family: futura;
+        top: 50%;
+        color: white;
+        text-shadow: 0px 0px 8px #000000;
+      }
+    </style>
+  </head>
 
-<script>
-	document.querySelector('#ov1').style.left=document.body.offsetWidth-document.querySelector('#ov1').offsetWidth-document.body.offsetWidth/4+"px";
-	document.querySelector('#ov2').style.right=document.body.offsetWidth-document.querySelector('#ov2').offsetWidth-document.body.offsetWidth/4+"px";
-let video1 = document.querySelector('#videoElement1');
-let video2 = document.querySelector('#videoElement2');
-  
-navigator.mediaDevices.getUserMedia({
-	video: {
-		//facingMode: 'environment',
-		deviceId: '086A079A7E3639031D8218364B1F0E9A7AF5F933',
-		width: {min: 360, ideal: 1280, max: 1920},
-		height: {min: 240, ideal: 720, max: 1080}
-	}
-}).then((stream) => {
-	if (video1.srcObject !== undefined) {
-		video1.srcObject = stream;
-	} else if (video.mozSrcObject !== undefined) {
-		video1.mozSrcObject = stream;
-	} else if (window.URL.createObjectURL) {
-		video1.src = window.URL.createObjectURL(stream);
-	} else if (window.webkitURL) {
-		video1.src = window.webkitURL.createObjectURL(stream);
-	} else {
-		video1.src = stream;
-	}
-	video1.playsInline = true;
-	video1.play();
-  	if (video2.srcObject !== undefined) {
-		video2.srcObject = stream;
-	} else if (video2.mozSrcObject !== undefined) {
-		video2.mozSrcObject = stream;
-	} else if (window.URL.createObjectURL) {
-		video2.src = window.URL.createObjectURL(stream);
-	} else if (window.webkitURL) {
-		video2.src = window.webkitURL.createObjectURL(stream);
-	} else {
-		video2.src = stream;
-	}
-	video2.playsInline = true;
-	video2.play();
-}).catch((error) => {
-	console.log(error);
-});
+  <body>
+    <div id="feed">
+      <video id="videoElement1"></video>
+      <video style="float: right" id="videoElement2"></video>
+    </div>
 
-</script>
-</body>
+    <div id="settings" style="display: none"></div>
+
+    <script>
+      let FeedSettingsToggle = true;
+
+      window.addEventListener("click", (Event) => {
+        if (
+          !["BUTTON", "INPUT", "SELECT", "OPTION"].includes(
+            Event.target.tagName
+          )
+        ) {
+          FeedSettingsToggle = !FeedSettingsToggle;
+          if (FeedSettingsToggle) {
+            // Show live feed
+            document.querySelector("#feed").style.display = "block";
+            document.querySelector("#settings").style.display = "none";
+          } else {
+            // Show settings
+            document.querySelector("#settings").style.display = "block";
+            document.querySelector("#feed").style.display = "none";
+          }
+        }
+      });
+
+      function CreateSelectElement(Options) {
+        let SelectElement = document.createElement("SELECT");
+
+        Options.forEach((Option) => {
+          let OptionElement = document.createElement("OPTION");
+          OptionElement.innerHTML = Option.Text;
+          SelectElement.appendChild(OptionElement);
+        });
+
+        SelectElement.addEventListener("change", (Event) => {
+          Options[SelectElement.selectedIndex].Method();
+        });
+
+        Options[0].Method();
+
+        return SelectElement;
+      }
+
+      let CurrentDeviceId = undefined;
+
+      let CurrentFacingMode = "user";
+      document.querySelector("#settings").appendChild(
+        CreateSelectElement([
+          {
+            Text: "user",
+            Method: () => {
+              CurrentFacingMode = "user";
+              StartStream();
+            },
+          },
+          {
+            Text: "environment",
+            Method: () => {
+              CurrentFacingMode = "environment";
+              StartStream();
+            },
+          },
+        ])
+      );
+
+      (async () => {
+        await navigator.mediaDevices.getUserMedia({ audio: true, video: true });
+        let Devices = await navigator.mediaDevices.enumerateDevices();
+        document.querySelector("#settings").appendChild(
+          CreateSelectElement(
+            Devices.filter((Device) => Device.kind == "videoinput").map(
+              (Device) => {
+                return {
+                  Text: Device.label,
+                  Method: () => {
+                    CurrentDeviceId = Device.deviceId;
+                    StartStream();
+                  },
+                };
+              }
+            )
+          )
+        );
+      })();
+
+      let FirstVideo = document.querySelector("#videoElement1");
+      let SecondVideo = document.querySelector("#videoElement2");
+
+      let Effects = [
+        { Text: "None", Method: () => {} },
+        {
+          Text: "Flip both upside down",
+          Method: () => {
+            FirstVideo.style.transform = "rotateX(180deg)";
+            SecondVideo.style.transform = "rotateX(180deg)";
+          },
+        },
+        {
+          Text: "Flip both vertically",
+          Method: () => {
+            FirstVideo.style.transform = "rotateY(180deg)";
+            SecondVideo.style.transform = "rotateY(180deg)";
+          },
+        },
+        {
+          Text: "Flip right vertically",
+          Method: () => {
+            SecondVideo.style.transform = "rotateY(180deg)";
+          },
+        },
+        {
+          Text: "Flip right horizontally",
+          Method: () => {
+            SecondVideo.style.transform = "rotateX(180deg)";
+          },
+        },
+        {
+          Text: "Grayscale",
+          Method: () => {
+            FirstVideo.style.filter = "grayscale(100%)";
+            SecondVideo.style.filter = "grayscale(100%)";
+          },
+        },
+        {
+          Text: "Saturate",
+          Method: () => {
+            FirstVideo.style.filter = "saturate(100%)";
+            SecondVideo.style.filter = "saturate(100%)";
+          },
+        },
+        {
+          Text: "Blur",
+          Method: () => {
+            FirstVideo.style.filter = "blur(5px)";
+            SecondVideo.style.filter = "blur(5px)";
+          },
+        },
+        {
+          Text: "Hue rotate",
+          Method: () => {
+            FirstVideo.style.filter = "hue-rotate(90deg)";
+            SecondVideo.style.filter = "hue-rotate(90deg)";
+          },
+        },
+        {
+          Text: "Invert colours",
+          Method: () => {
+            FirstVideo.style.filter = "invert(100%)";
+            SecondVideo.style.filter = "invert(100%)";
+          },
+        },
+      ];
+
+      let EffectReset = () => {
+        FirstVideo.style.transform = "none";
+        SecondVideo.style.transform = "none";
+        FirstVideo.style.filter = "none";
+        FirstVideo.style.filter = "none";
+      };
+
+      document.querySelector("#settings").appendChild(
+        CreateSelectElement(
+          Effects.map((Effect) => {
+            return {
+              Text: Effect.Text,
+              Method: () => {
+                EffectReset();
+                Effect.Method();
+              },
+            };
+          })
+        )
+      );
+
+      function StartStream() {
+        navigator.mediaDevices
+          .getUserMedia({
+            video: {
+              facingMode: CurrentFacingMode,
+              deviceId: CurrentDeviceId,
+              width: { min: 360, ideal: 1280, max: 1920 },
+              height: { min: 240, ideal: 720, max: 1080 },
+            },
+          })
+          .then((stream) => {
+            if (FirstVideo.srcObject !== undefined) {
+              FirstVideo.srcObject = stream;
+            } else if (video.mozSrcObject !== undefined) {
+              FirstVideo.mozSrcObject = stream;
+            } else if (window.URL.createObjectURL) {
+              FirstVideo.src = window.URL.createObjectURL(stream);
+            } else if (window.webkitURL) {
+              FirstVideo.src = window.webkitURL.createObjectURL(stream);
+            } else {
+              FirstVideo.src = stream;
+            }
+            FirstVideo.playsInline = true;
+            FirstVideo.play();
+
+            if (SecondVideo.srcObject !== undefined) {
+              SecondVideo.srcObject = stream;
+            } else if (SecondVideo.mozSrcObject !== undefined) {
+              SecondVideo.mozSrcObject = stream;
+            } else if (window.URL.createObjectURL) {
+              SecondVideo.src = window.URL.createObjectURL(stream);
+            } else if (window.webkitURL) {
+              SecondVideo.src = window.webkitURL.createObjectURL(stream);
+            } else {
+              SecondVideo.src = stream;
+            }
+            SecondVideo.playsInline = true;
+            SecondVideo.play();
+          })
+          .catch((Error) => {
+            alert(Error);
+          });
+      }
+
+      StartStream();
+    </script>
+  </body>
 </html>
