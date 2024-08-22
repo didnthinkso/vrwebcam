@@ -25,13 +25,22 @@
         margin: 0;
       }
 
-      h1 {
-        position: fixed;
+      #ToggleButton {
+        width: 100vw;
+        height: 20vh;
+        background-color: red;
+        position:fixed;
+        top:0;
         display: none;
-        font-family: futura;
-        top: 50%;
-        color: white;
-        text-shadow: 0px 0px 8px #000000;
+        font-size: xxx-large;
+      }
+
+      select {
+        display: block;
+    width: 100vw;
+    height: 20vh;
+    font-size: xxx-large;
+    margin-bottom: 1em;
       }
     </style>
   </head>
@@ -44,16 +53,14 @@
 
     <div id="settings" style="display: none"></div>
 
+    <button id="ToggleButton">Toggle View</button>
     <script>
       let FeedSettingsToggle = true;
 
-      window.addEventListener("click", (Event) => {
-        if (
-          !["BUTTON", "INPUT", "SELECT", "OPTION"].includes(
-            Event.target.tagName
-          )
-        ) {
-          FeedSettingsToggle = !FeedSettingsToggle;
+      window.addEventListener("click",  ProcessClick);
+     
+      document.querySelector("#ToggleButton").addEventListener("click", () => {
+        FeedSettingsToggle = !FeedSettingsToggle;
           if (FeedSettingsToggle) {
             // Show live feed
             document.querySelector("#feed").style.display = "block";
@@ -64,7 +71,20 @@
             document.querySelector("#feed").style.display = "none";
           }
         }
-      });
+  )
+
+      function ProcessClick (Event) {
+        if (
+          !["BUTTON", "INPUT", "SELECT", "OPTION"].includes(
+            Event.target.tagName
+          )
+        ) {
+          document.querySelector("#ToggleButton").style.display = "block";
+          setTimeout(() => {
+            document.querySelector("#ToggleButton").style.display = "none";
+          }, 3000)
+      };
+    }
 
       function CreateSelectElement(Options) {
         let SelectElement = document.createElement("SELECT");
